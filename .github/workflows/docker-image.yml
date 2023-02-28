@@ -1,18 +1,20 @@
-name: Docker Image CI
-
+name: tests
 on:
   push:
-    branches: [ "main" ]
+    branches: ['*']
   pull_request:
-    branches: [ "main" ]
-
+    branches: ['*']
 jobs:
-
-  build:
-
+  docker:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - uses: actions/checkout@v2
+    - name: docker
+      run: |
+        git submodule init
+        git submodule update
+        docker-compose up -d --build
+        docker ps -a
+        sleep 20
+        docker exec pagila-hw_pg_2 ./check_answers.sh
+        #docker-compose exec pg ./check_answers.sh
